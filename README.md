@@ -8,6 +8,7 @@ Platform Dienstverlening is een gezamenlijke ontwikkeling van de gemeenten Den H
 
 - GZAC
 - KISS
+- NL Portal
 - Open Formulieren
 - Open Inwoner Portaal
 - GPP-WOO
@@ -21,8 +22,6 @@ Platform Dienstverlening is een gezamenlijke ontwikkeling van de gemeenten Den H
 - Open Product
 - Objecten
 - Objecttypen
-
-De componenten NL Portal en OpenFSC worden binnenkort nog toegevoegd.
 
 ## Lokaal aan de slag
 
