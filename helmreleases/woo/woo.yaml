@@ -1,0 +1,115 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: woo
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: gpp-stack
+      version: "0.2.4"
+      sourceRef:
+        kind: HelmRepository
+        name: gpp-woo
+      interval: 5m
+  valuesFrom:
+    - kind: Secret
+      name: woo-secrets
+    - kind: Secret
+      name: postgresql
+      valuesKey: password
+      targetPath: gpp-app.settings.database.password
+    - kind: Secret
+      name: postgresql
+      valuesKey: password
+      targetPath: gpp-publicatiebank.settings.database.password
+  values:
+    openzaak:
+      enabled: false
+
+    gpp-app:
+      image:
+        tag: 1.0.0-rc0
+      ingress:
+        className: ingress-nginx-external
+        enabled: true
+        hosts:
+        - host: woo-app.example.com
+          paths:
+          - path: /
+            pathType: ImplementationSpecific
+        tls:
+          - hosts:
+              - woo-publicatiebank.example.com
+              - woo-burgerportaal.example.com
+              - woo-app.example.com
+            secretName: ingress-tls
+      settings:
+        database:
+          host: postgresql
+          name: woo-app
+          username: pdv
+          port: 5432
+          sslmode: prefer
+        gppPublicatiebank:
+          baseUrl: https://woo-publicatiebank.example.com
+        oidc:
+          adminRole: admin
+          authority: https://authn.example.com/realms/Platform%20Dienstverlening
+          clientId: PFDV_WOO
+          roleClaimType: roles
+
+    gpp-burgerportaal:
+      image:
+        repository: ghcr.io/gpp-woo/gpp-burgerportaal
+        tag: main
+      ingress:
+        className: ingress-nginx-external
+        enabled: true
+        hosts:
+        - host: woo-burgerportaal.example.com
+          paths:
+          - path: /
+            pathType: ImplementationSpecific
+        tls:
+          - hosts:
+              - woo-publicatiebank.example.com
+              - woo-burgerportaal.example.com
+              - woo-app.example.com
+            secretName: ingress-tls
+      settings:
+        gppPublicatiebank:
+          baseUrl: https://woo-publicatiebank.example.com
+
+    gpp-publicatiebank:
+      redis:
+        image:
+          repository: bitnamilegacy/redis
+
+      image:
+        tag: 1.1.0-beta.0
+
+      ingress:
+        className: ingress-nginx-external
+        enabled: true
+        hosts:
+        - host: woo-publicatiebank.example.com
+          paths:
+          - path: /
+            pathType: ImplementationSpecific
+        tls:
+          - hosts:
+              - woo-publicatiebank.example.com
+              - woo-burgerportaal.example.com
+              - woo-app.example.com
+            secretName: ingress-tls
+      settings:
+        allowedHosts: woo-publicatiebank.example.com
+        database:
+          host: postgresql
+          name: woo-publicatiebank
+          username: pdv
+          port: 5432
+          sslmode: prefer
+        disable2fa: true

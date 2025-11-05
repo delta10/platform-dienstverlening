@@ -1,0 +1,13 @@
+apiVersion: enterprisesearch.k8s.elastic.co/v1
+kind: EnterpriseSearch
+metadata:
+  name: kiss
+  namespace: demodam-demo
+spec:
+  config:
+    app_search.engine.total_fields.limit: 1000
+    kibana.host: https://kibana.demodam.example.com
+  count: 1
+  elasticsearchRef:
+    name: kiss
+  version: 8.9.0

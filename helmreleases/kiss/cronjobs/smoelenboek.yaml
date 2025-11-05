@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kiss-elastic-sync-job-smoelenboek
+  namespace: demodam-demo
+spec:
+  schedule: "*/59 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: kiss-elastic-sync
+            image: ghcr.io/klantinteractie-servicesysteem/kiss-elastic-sync:0.1.2
+            imagePullPolicy: Always
+            args:
+            - smoelenboek
+            envFrom:
+            - secretRef:
+                name: kiss-secrets
+            - configMapRef:
+                name: kiss-config
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              readOnlyRootFilesystem: true
+              runAsUser: 10000
+              capabilities:
+                drop: [ALL]
+          restartPolicy: Never

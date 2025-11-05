@@ -1,0 +1,160 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nl-portal-backend
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: nl-portal-backend
+      version: "2.0.2"
+      sourceRef:
+        kind: HelmRepository
+        name: nl-portal
+  values:
+    tags:
+      postgresql: false
+      keycloak: false
+
+    existingSecret: nl-portal-backend-secrets
+
+    replicaCount: 1
+
+    image:
+      repository: ghcr.io/nl-portal/nl-portal-app-backend
+      tag: main-202509300843-186e5682-SHAPSHOT
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 4G
+      className: nginx
+      host: nl-portaal.demodam.example.com
+      tls:
+        - hosts:
+            - nl-portaal.demodam.example.com
+          secretName: ingress-tls
+
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 12Mi
+
+    settings:
+      keycloak:
+        url: https://authn.demodam.example.com
+        version: 26.3.0
+        realm: pdv
+        audience: pdv
+        clientID: nl-portal-m2m
+
+      database:
+        url: jdbc:postgresql://postgresql-cluster-rw/nl-portal
+        username: pdv
+
+      services:
+        besluitenapi:
+          enabled: true
+          properties:
+            url: https://zaken.demodam.example.com
+            clientId: nl-portal
+
+        catalogiapi:
+          enabled: true
+          properties:
+            url: https://zaken.demodam.example.com
+            clientId: nl-portal
+            secret: something-secret-and-really-long # This cannot be configured from the secret yet, see https://github.com/nl-portal/helm-charts/pull/10
+
+        documentenapis:
+          enabled: true
+          properties:
+            defaultDocumentApi: openzaak
+            configurations:
+              openzaak:
+                url: https://zaken.demodam.example.com/documenten/api/v1
+                clientId: nl-portal
+                rsin: "051845623"
+                documentTypeUrl: https://zaken.demodam.example.com/catalogi/api/v1/informatieobjecttypen/efc332f2-be3b-4bad-9e3c-49a6219c92ad
+              dummydoc:
+                url: https://zaken.demodam.example.com/documenten/api/v1
+                clientId: nl-portal
+
+        virusscan:
+          clamav:
+            enabled: false
+
+        zakenapi:
+          enabled: true
+          properties:
+            url:  https://zaken.demodam.example.com
+            clientId: nl-portal
+            secret: something-secret-and-really-long # This cannot be configured from the secret yet, see https://github.com/nl-portal/helm-charts/pull/10
+            zaakdocumentenConfig:
+              vertrouwelijkheidsaanduidingWhitelist: openbaar,beperkt_openbaar,intern,zaakvertrouwelijk,vertrouwelijk,confidentieel,geheim,zeer_geheim
+              statusWhitelist: ter_vaststelling,in_bewerking,definitief,gearchiveerd
+
+        objectenapi:
+          enabled: true
+          properties:
+            url: https://objecten.demodam.example.com
+
+        openklant:
+          enabled: false
+
+        openklant2:
+          enabled: true
+          properties:
+            klantinteractiesApiUrl: https://klanten.demodam.example.com/klantinteracties/api/v1
+
+        haalcentraal_brp:
+          enabled: false
+
+        haalcentraal_hr:
+          enabled: false
+
+        haalcentraal2:
+          enabled: true
+          properties:
+            brpApiUrl: http://brp-api-personen-mock/haalcentraal/api/brp/
+            bewoningApiUrl: http://brp-api-bewoning-bevragen-mock/haalcentraal/api/bewoning/
+
+        taak:
+          enabled: true
+          properties:
+            typeUrl: https://objecttypen.demodam.example.com/api/v2/objecttypes/3e852115-277a-4570-873a-9a64be3aeb34
+            typeUrlV2: https://objecttypen.demodam.example.com/api/v2/objecttypes/b4a617af-6969-45e8-9afd-d51e170716d5
+
+        berichten:
+          enabled: true
+          properties:
+            berichtObjectTypeUrl: https://objecttypen.demodam.example.com/api/v2/objecttypes/78731088-430f-49fd-9a4c-80ddd42ded28
+
+        product:
+          enabled: true
+          properties:
+            productTypeUrl: https://objecttypen.demodam.example.com/api/v2/objecttypes/3e852115-277a-4570-873a-9a64be3aeb34
+            productInstantieTypeUrl: https://objecttypen.demodam.example.com/api/v2/objecttypes/3e852115-277a-4570-873a-9a64be3aeb34
+            productDetailsTypeUrl: https://objecttypen.demodam.example.com/api/v2/objecttypes/3e852115-277a-4570-873a-9a64be3aeb34
+            productVerbruiksObjectTypeUrl: https://objecttypen.demodam.example.com/api/v2/objecttypes/3e852115-277a-4570-873a-9a64be3aeb34
+
+        dmn:
+          enabled: true
+          properties:
+            url: https://objecten.demodam.example.com
+
+        prefill:
+          enabled: true
+          properties:
+            typeUrl: https://objecttypen.demodam.example.com/api/v1/objecttypes/3e852115-277a-4570-873a-9a64be3aeb34
+
+        payment:
+          direct:
+            enabled: false
+
+          ogone:
+            enabled: false

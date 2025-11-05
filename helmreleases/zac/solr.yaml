@@ -1,0 +1,61 @@
+apiVersion: solr.apache.org/v1beta1
+kind: SolrCloud
+metadata:
+  name: zac-solr
+  namespace: demodam-demo
+spec:
+  availability:
+    podDisruptionBudget:
+      enabled: true
+      method: ClusterWide
+  busyBoxImage:
+    repository: library/busybox
+    tag: 1.28.0-glibc
+  customSolrKubeOptions: {}
+  dataStorage:
+    persistent:
+      pvcTemplate:
+        metadata: {}
+        spec:
+          resources:
+            requests:
+              storage: 20Gi
+      reclaimPolicy: Retain
+  replicas: 1
+  scaling:
+    populatePodsOnScaleUp: true
+    vacatePodsOnScaleDown: true
+  solrAddressability:
+    commonServicePort: 80
+    podPort: 8983
+  solrImage:
+    repository: library/solr
+    tag: 9.8.1@sha256:d5e424e1ccdb52e9cf24bb03f4dd9c7c73b8459318eb58db43249ded0e3a48c3
+  solrJavaMem: -Xms512m -Xmx768m
+  solrLogLevel: INFO
+  updateStrategy:
+    managed: {}
+    method: Managed
+  zookeeperRef:
+    provided:
+      adminServerService: {}
+      chroot: /
+      clientService: {}
+      config: {}
+      headlessService: {}
+      image:
+        pullPolicy: IfNotPresent
+        repository: pravega/zookeeper
+        tag: 0.2.15@sha256:c498ebfb76a66f038075e2fa6148528d74d31ca1664f3257fdf82ee779eec9c8
+      maxUnavailableReplicas: 1
+      persistence:
+        reclaimPolicy: Retain
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+      replicas: 1
+      zookeeperPodPolicy:
+        resources: {}

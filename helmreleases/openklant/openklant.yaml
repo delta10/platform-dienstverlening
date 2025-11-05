@@ -1,0 +1,214 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openklant
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: openklant
+      version: "1.8.2"
+      sourceRef:
+        kind: HelmRepository
+        name: maykin
+  valuesFrom:
+    - kind: Secret
+      name: openklant-secrets
+    - kind: Secret
+      name: postgresql-cluster-app
+      valuesKey: password
+      targetPath: settings.database.password
+  values:
+    tags:
+      redis: true
+
+    replicaCount: 1
+
+    image:
+      repository: maykinmedia/open-klant
+      pullPolicy: IfNotPresent
+      tag: "2.13.0"
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+      className: "nginx"
+      hosts:
+       - host: klanten.demodam.example.com
+         paths:
+           - path: /
+             pathType: ImplementationSpecific
+      tls:
+        - hosts:
+            - klanten.demodam.example.com
+          secretName: ingress-tls
+
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 12Mi
+
+    persistence:
+      enabled: false
+      size: 10Gi
+
+    global:
+      configuration:
+        enabled: true
+        overwrite: true
+
+    configuration:
+      enabled: true
+      initContainer:
+        enabled: false
+      job:
+        enabled: true
+        ttlSecondsAfterFinished: 600
+
+      data: |-
+        oidc_db_config_enable: True
+        oidc_db_config_admin_auth:
+          providers:
+            - identifier: admin-oidc-provider
+              oidc_token_use_basic_auth: true
+              oidc_use_nonce: false
+              oidc_nonce_size: 32
+              oidc_state_size: 32
+              endpoint_config:
+                oidc_op_discovery_endpoint: https://authn.demodam.example.com/realms/pdv/
+
+          items:
+          - identifier: admin-oidc
+            enabled: True
+            oidc_provider_identifier: admin-oidc-provider
+            oidc_rp_client_id: registers
+            oidc_rp_client_secret: IFpajZi8ktEJwwrw5Sod7clIgtZqg1WW
+            oidc_rp_scopes_list:
+            - openid
+            - email
+            - profile
+            - roles
+            oidc_rp_sign_algo: RS256
+            userinfo_claims_source: id_token
+            options:
+              user_settings:
+                claim_mappings:
+                  username:
+                    - sub
+                  email:
+                    - email
+                  first_name:
+                    - given_name
+                  last_name:
+                    - family_name
+                username_case_sensitive: true
+              groups_settings:
+                claim_mapping:
+                  - groups
+                superuser_group_names:
+                  - superuser
+                make_users_staff: true
+                sync: true
+                sync_pattern: "*"
+                default_groups: []
+
+        tokenauth_config_enable: true
+        tokenauth:
+          items:
+            - identifier: openforms
+              token: something-secret-for-openforms
+              contact_person: openforms
+              email: openforms@demodam.example.com
+            - identifier: kiss
+              token: something-secret-for-kiss
+              contact_person: kiss
+              email: kiss@demodam.example.com
+            - identifier: nl-portal
+              token: something-secret-for-nl-portal
+              contact_person: nl-portal
+              email: nl-portal@demodam.example.com
+            - identifier: openinwoner
+              token: something-secret-for-openinwoner
+              contact_person: openinwoner
+              email: openinwoner@demodam.example.com
+
+    settings:
+      allowedHosts: "localhost,klanten.demodam.example.com,openklant.openklant,kiss.demodam.example.com"
+      djangoSettingsModule: openklant.conf.docker
+      useXForwardedHost: true
+
+      environment: "test"
+
+      database:
+        host: postgresql-cluster-rw
+        username: pdv
+        name: openklant
+
+      email:
+        host: ""
+        port: 25
+        username: ""
+        useTLS: true
+        defaultFrom: "noreply@dienstverlening.demodam.example.com"
+
+      isHttps: true
+      debug: false
+
+      notificationsDisabled: true
+
+    worker:
+      replicaCount: 1
+      concurrency: 4
+      podLabels: {}
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 10m
+          memory: 12Mi
+      livenessProbe:
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+        successThreshold: 1
+      readinessProbe:
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+        successThreshold: 1
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 100
+        targetCPUUtilizationPercentage: 80
+        targetMemoryUtilizationPercentage: 80
+
+    ##################
+    # Redis subchart #
+    ##################
+
+    redis:
+      image:
+        repository: bitnamilegacy/redis
+
+      architecture: standalone
+      auth:
+        enabled: false
+      master:
+        persistence:
+          enabled: false
+        resources:
+          requests:
+            cpu: 10m
+            memory: 12Mi
+          limits:
+            memory: 500Mi
+            cpu: 500m

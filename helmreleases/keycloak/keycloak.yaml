@@ -1,0 +1,54 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: keycloak
+  namespace: demodam-demo
+spec:
+  interval: 24h
+  type: oci
+  url: oci://registry-1.docker.io/bitnamicharts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: keycloak
+  namespace: demodam-demo
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: keycloak
+      version: "25.2.0"
+      sourceRef:
+        kind: HelmRepository
+        name: keycloak
+      interval: 12h
+  values:
+    image:
+      repository: bitnamilegacy/keycloak
+
+    replicaCount: 1
+    production: true
+    proxyHeaders: "xforwarded"
+    postgresql:
+      enabled: false
+    externalDatabase:
+      host: "postgresql-cluster-rw"
+      database: "keycloak"
+      existingSecret: "postgresql-cluster-app"
+      existingSecretUserKey: "user"
+      existingSecretPasswordKey: "password"
+
+    extraEnvVars:
+      - name: KC_FEATURES # This is required by NL Portal
+        value: token-exchange:v1,admin-fine-grained-authz:v1
+
+    ingress:
+      enabled: true
+      tls: true
+      ingressClassName: "nginx"
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+        nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hostname: authn.demodam.example.com

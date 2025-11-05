@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: postgresql
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: postgresql
+      version: "16.7.26"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami-oci
+  values:
+    image:
+      repository: bitnamilegacy/postgresql
+
+    auth:
+      username: pdv
+      database: pdv
+
+    primary:
+      resources:
+        requests:
+          memory: 12Mi
+          cpu: 10m
+
+      initdb:
+        user:
+        scripts:
+          01-create-databases.sql:
+            CREATE DATABASE gzac;
+            CREATE DATABASE kiss;
+            CREATE DATABASE nl-portal;
+            CREATE DATABASE objecten;
+            CREATE DATABASE objecttypen;
+            CREATE DATABASE openarchiefbeheer;
+            CREATE DATABASE openforms;
+            CREATE DATABASE openinwoner;
+            CREATE DATABASE openklant;
+            CREATE DATABASE opennotificaties;
+            CREATE DATABASE openproduct;
+            CREATE DATABASE openzaak;
+            CREATE DATABASE woo-app;
+            CREATE DATABASE woo-publicatiebank;
+            CREATE DATABASE zac;

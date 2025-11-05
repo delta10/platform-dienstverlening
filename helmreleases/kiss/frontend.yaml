@@ -1,0 +1,49 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kiss-frontend
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kiss-frontend
+      version: "1.1.1"
+      sourceRef:
+        kind: HelmRepository
+        name: kiss
+  values:
+    replicaCount: 1
+
+    postgresql:
+      enabled: false
+
+    image:
+      tag: release-1.0.x-20250418091744-8936963
+
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - host: kiss.demodam.example.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: ingress-tls
+          hosts:
+            - authn.demodam.example.com
+            - kiss.demodam.example.com
+            - portaal.demodam.example.com
+            - formulier.demodam.example.com
+            - nl-portaal.demodam.example.com
+            - objecten.demodam.example.com
+            - objecttypen.demodam.example.com
+            - archiefbeheer.demodam.example.com
+            - klanten.demodam.example.com
+            - notificaties.demodam.example.com
+            - producten.demodam.example.com
+            - zaken.demodam.example.com

@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gzac-frontend
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: gzac-frontend
+      version: "0.1.14"
+      sourceRef:
+        kind: HelmRepository
+        name: gzac
+  values:
+    replicaCount: 1
+
+    image:
+      repository: ritense/gzac-frontend
+      tag: 13.1.0
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 4G
+      className: ingress-nginx-external
+      hosts:
+        - host: gzac.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 12Mi
+
+    settings:
+      apiURL: https://gzac.example.com/api
+      whitelistedDomain: gzac.example.com
+
+      keycloak:
+        url: https://authn.example.com
+        clientID: gzac-frontend
+        realm: pdv
+        logoutRedirectURL: https://authn.example.com
+        redirectURL: https://gzac.example.com/keycloak

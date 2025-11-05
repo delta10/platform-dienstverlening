@@ -1,0 +1,86 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zac
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: zaakafhandelcomponent
+      version: "1.0.110"
+      sourceRef:
+        kind: HelmRepository
+        name: zac
+      interval: 5m
+  valuesFrom:
+    - kind: Secret
+      name: zac-secrets
+    - kind: Secret
+      name: postgresql
+      valuesKey: password
+      targetPath: db.password
+  values:
+    image:
+      tag: 3.13.20
+    auth:
+      clientId: zaakafhandelcomponent
+      realm: Zaakafhandelcomponent
+      server: https://authn.demodam.example.com
+    keycloak:
+      adminClient:
+        id: zaakafhandelcomponent-admin-client
+    bagApi:
+      url: https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/
+    brpApi:
+      url: http://personen-mock:5010/haalcentraal/api
+    catalogusDomein: GEMDB
+    contextUrl: https://zac.demodam.example.com
+    db:
+      host: postgresql
+      name: zac
+      user: zac
+    gemeente:
+      code: "0796"
+      mail: noreply@demodam.example.com
+      naam: demodam
+    ingress:
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 4G
+      className: ingress-nginx-external
+      enabled: true
+      hosts:
+      - host: zac.demodam.example.com
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+      tls:
+      - hosts:
+        - zac.demodam.example.com
+        secretName: ingress-tls
+    klantinteractiesApi:
+      url: http://openklant.openklant
+    kvkApi:
+      url: https://api.kvk.nl/test/api
+    mail:
+      smtp:
+        server: localhost
+    objectenApi:
+      url: http://objecten.objecten
+    opa:
+      sidecar: false
+    openForms:
+      url: https://formulier.demodam.example.com
+    organizations:
+      bron:
+        rsin: "002220647"
+      verantwoordelijke:
+        rsin: "002220647"
+    replicaCount: 1
+    solr:
+      url: http://solr-solrcloud-common
+    solr-operator:
+      enabled: false
+    zgwApis:
+      clientId: zac
+      url: http://openzaak.openzaak

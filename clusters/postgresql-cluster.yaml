@@ -1,0 +1,191 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgresql-cluster
+  namespace: demodam-demo
+spec:
+  instances: 1
+
+  imageName: ghcr.io/cloudnative-pg/postgis:17-3.5
+
+  bootstrap:
+    initdb:
+      database: pdv
+      owner: pdv
+      postInitTemplateSQL:
+        - CREATE EXTENSION postgis;
+        - CREATE EXTENSION postgis_topology;
+        - CREATE EXTENSION fuzzystrmatch;
+        - CREATE EXTENSION postgis_tiger_geocoder;
+
+  postgresql:
+    parameters:
+      max_connections: "255"
+
+  storage:
+    size: 40Gi
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: gzac
+  namespace: demodam-demo
+spec:
+  name: gzac
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: kiss
+  namespace: demodam-demo
+spec:
+  name: kiss
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: objecten
+  namespace: demodam-demo
+spec:
+  name: objecten
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: objecttypen
+  namespace: demodam-demo
+spec:
+  name: objecttypen
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: openarchiefbeheer
+  namespace: demodam-demo
+spec:
+  name: openarchiefbeheer
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: openforms
+  namespace: demodam-demo
+spec:
+  name: openforms
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: openinwoner
+  namespace: demodam-demo
+spec:
+  name: openinwoner
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: openklant
+  namespace: demodam-demo
+spec:
+  name: openklant
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: opennotificaties
+  namespace: demodam-demo
+spec:
+  name: opennotificaties
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: openproduct
+  namespace: demodam-demo
+spec:
+  name: openproduct
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: openzaak
+  namespace: demodam-demo
+spec:
+  name: openzaak
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: woo
+  namespace: demodam-demo
+spec:
+  name: woo
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: zac
+  namespace: demodam-demo
+spec:
+  name: zac
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: nl-portal
+  namespace: demodam-demo
+spec:
+  name: nl-portal
+  owner: pdv
+  cluster:
+    name: postgresql-cluster
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: keycloak
+  namespace: demodam-demo
+spec:
+  name: keycloak
+  owner: pdv
+  cluster:
+    name: postgresql-cluster

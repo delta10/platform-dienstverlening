@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: gpp-woo
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  url: https://GPP-Woo.github.io/charts

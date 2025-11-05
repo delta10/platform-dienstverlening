@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brp-api-bewoning-bevragen-mock
+  namespace: demodam-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: brp-api-bewoning-bevragen-mock
+  template:
+    metadata:
+      labels:
+        app: brp-api-bewoning-bevragen-mock
+    spec:
+      containers:
+      - name: bewoning-bevragen-mock
+        image: ghcr.io/brp-api/haal-centraal-bewoning-bevragen-mock:2.0.1
+        ports:
+          - containerPort: 5010
+            name: http
+        env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: Release
+          - name: ASPNETCORE_URLS
+            value: http://+:5010
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: brp-api-bewoning-bevragen-mock
+  namespace: demodam-demo
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: brp-api-bewoning-bevragen-mock

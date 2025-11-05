@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kiss-config
+  namespace: demodam-demo
+data:
+  USE_KLANTINTERACTIES: 'true'
+  REGISTERS__0__IS_DEFAULT: 'true'
+  REGISTERS__0__KLANTINTERACTIE_BASE_URL: 'https://klanten.demodam.example.com/klantinteracties'
+  REGISTERS__0__REGISTRY_VERSION: 'OpenKlant2'
+  AFDELINGEN_BASE_URL: https://objecten.demodam.example.com
+  AFDELINGEN_OBJECT_TYPE_URL: https://objecttypen.demodam.example.com/api/v2/objecttypes/29be6673-ce45-41b2-9d85-229e94669256
+  ELASTIC_BASE_URL: https://kiss-es-http:9200
+  ELASTIC_USERNAME: elastic
+  EMAIL_ENABLE_SSL: 'true'
+  EMAIL_HOST: mailpit
+  EMAIL_PORT: '1025'
+  ENTERPRISE_SEARCH_BASE_URL: https://kiss-ent-http:3002
+  ENTERPRISE_SEARCH_ENGINE: kiss-engine
+  FEEDBACK_EMAIL_FROM: noreply@demodam.example.com
+  FEEDBACK_EMAIL_TO: noreply@demodam.example.com
+  GROEPEN_BASE_URL: https://objecten.demodam.example.com
+  GROEPEN_OBJECT_TYPE_URL: https://objecttypen.demodam.example.com/api/v2/objecttypes/9f54f140-4bdb-4057-b5f0-f7a093202460
+  HAAL_CENTRAAL_BASE_URL: http://brp-api-personen-mock/haalcentraal/api
+  INTERNE_TAAK_BASE_URL: https://objecten.demodam.example.com
+  INTERNE_TAAK_OBJECT_TYPE_URL: https://objecttypen.demodam.example.com/api/v2/objecttypes/0d18d35e-18a1-4978-8f0f-5fcea6eeaf06
+  KVK_BASE_URL: https://api.kvk.nl/test/api
+  MEDEWERKER_OBJECTEN_BASE_URL: https://objecten.demodam.example.com
+  MEDEWERKER_OBJECT_TYPE_URL: https://objecttypen.demodam.example.com/api/v2/objecttypes/c6a40bc1-7d3c-407a-bef4-3e122b70cf18
+  OIDC_AUTHORITY: https://authn.demodam.example.com/realms/pdv
+  OIDC_CLIENT_ID: kiss
+  OIDC_MEDEWERKER_IDENTIFICATIE_CLAIM: email
+  ORGANISATIE_IDS: '001709124'
+  POSTGRES_DB: 'kiss'
+  POSTGRES_HOST: 'postgresql-cluster-rw'
+  POSTGRES_USER: 'pdv'
+  POSTGRES_PORT: '5432'
+  SDG_BASE_URL: https://objecten.demodam.example.com
+  SDG_OBJECTEN_BASE_URL: https://objecten.demodam.example.com
+  SDG_OBJECT_TYPE_URL: https://objecttypen.demodam.example.com/api/v2/objecttypes/2e08fc04-d477-4b75-9b2e-5f4712af339a
+  VAC_OBJECTEN_BASE_URL: https://objecten.demodam.example.com
+  VAC_OBJECT_TYPE_URL: https://objecttypen.demodam.example.com/api/v2/objecttypes/32af30cd-5977-4f3f-a441-a15e64b7cb2c
+  VAC_OBJECT_TYPE_VERSION: '1'
+  REGISTERS__0__ZAAKSYSTEEM_API_CLIENT_ID: kiss
+  REGISTERS__0__ZAAKSYSTEEM_BASE_URL: https://zaken.demodam.example.com
+  REGISTERS__0__ZAAKSYSTEEM_DEEPLINK_URL: https://zaken.demodam.example.com/admin/zaken/zaak/?q=
+  REGISTERS__0__ZAAKSYSTEEM_DEEPLINK_PROPERTY: identificatie

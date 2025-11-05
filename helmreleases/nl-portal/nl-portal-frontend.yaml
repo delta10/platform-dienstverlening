@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nl-portal-frontend
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: nl-portal-frontend
+      version: "2.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: nl-portal
+  values:
+    replicaCount: 1
+
+    image:
+      repository: ghcr.io/nl-portal/nl-portal-app-frontend
+      tag: main-202509300843-186e5682-SHAPSHOT
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 4G
+      className: nginx
+      host: nl-portaal.demodam.example.com
+      tls:
+        - hosts:
+            - nl-portaal.demodam.example.com
+          secretName: ingress-tls
+
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 12Mi
+
+    settings:
+      oidc:
+        url: https://authn.demodam.example.com
+        realm: pdv
+        clientID: nl-portal
+        redirectURL: https://nl-portaal.demodam.example.com/keycloak/callback
+        postLogoutRedirectUrl: https://nl-portaal.demodam.example.com
+
+      app:
+        backendUrl: https://nl-portaal.demodam.example.com

@@ -1,0 +1,120 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gzac-backend
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: gzac-backend
+      version: "3.5.0"
+      sourceRef:
+        kind: HelmRepository
+        name: gzac
+  valuesFrom:
+    - kind: Secret
+      name: gzac-backend-secrets
+    - kind: Secret
+      name: postgresql
+      valuesKey: password
+      targetPath: settings.spring.datasource.password
+  values:
+    tags:
+      postgresql: false
+      mysql: false
+      keycloak: false
+
+    replicaCount: 1
+
+    cache: tcp://redis-master.redis:6379
+
+    image:
+      repository: ritense/gzac-backend
+      tag: 13.1.0
+
+    persistence:
+      enabled: false
+      size: 10Gi
+      existingClaim: null
+      mountPath: /tmp
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 4G
+      className: ingress-nginx-external
+      hosts:
+       - host: gzac.example.com
+         paths:
+           - path: /api
+             pathType: Prefix
+             backend:
+              service:
+                name: gzac-backend
+                port:
+                  number: 80
+           - path: /v3
+             pathType: Prefix
+             backend:
+              service:
+                name: gzac-backend
+                port:
+                  number: 80
+           - path: /camunda
+             pathType: Prefix
+             backend:
+              service:
+                name: gzac-backend
+                port:
+                  number: 80
+
+    serviceAccount:
+      create: true
+      name: gzac-backend-sa
+
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 12Mi
+
+    settings:
+      spring:
+        profiles:
+          active: cloud
+        actuator:
+          username: admin
+        datasource:
+          url: jdbc:postgresql://postgresql/gzac
+          username: pdv
+        security:
+          oauth2:
+            resourceserver:
+              jwt:
+                jwkSetUri:
+            client:
+              provider:
+                keycloakjwt:
+                  issuerUri:
+                keycloakapi:
+                  issuerUri:
+              registration:
+                keycloakjwt:
+                  clientId:
+                keycloakapi:
+                  clientId:
+      keycloak:
+        version: 26.3.0
+        authServerURL: https://authn.example.com
+        realm: pdv
+        clientID: gzac-backend
+        publicKey: "MII"
+      valtimo:
+        databaseType: postgres
+        appHostName:
+        serverPort: 8080
+      camunda:
+        adminUserID: admin

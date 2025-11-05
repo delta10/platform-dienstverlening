@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: zac
+  namespace: demodam-demo
+spec:
+  interval: 5m
+  url: https://infonl.github.io/dimpact-zaakafhandelcomponent
