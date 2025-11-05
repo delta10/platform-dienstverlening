@@ -39,19 +39,13 @@ flux check --pre
 flux install
 ```
 
-Installeer nu de Solr operator met:
-
-```
-./pre-install.sh
-```
-
 En voeg alle resources toe aan je cluster:
 
 ```
 ./apply.sh
 ```
 
-Als de PostgreSQL database is opgestart, voer het volgende nog uit:
+Als de PostgreSQL database is opgestart, voer het volgende nog uit om de Postgis extensie te activeren op verschillende databases:
 
 ```
 POSTGRES_PASSWORD=$(cat "$POSTGRES_POSTGRES_PASSWORD_FILE")
