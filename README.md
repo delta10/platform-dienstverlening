@@ -6,12 +6,13 @@ Platform Dienstverlening is een gezamenlijke ontwikkeling van de gemeenten Den H
 
 ### Applicaties
 
+- GPP-WOO
 - GZAC
 - KISS
 - NL Portal
 - Open Formulieren
 - Open Inwoner Portaal
-- GPP-WOO
+- ZAC
 
 ### Registraties
 
